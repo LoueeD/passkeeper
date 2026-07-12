@@ -1,0 +1,39 @@
+{
+  "name": "passkeeper",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Passkey-first auth primitives for Cloudflare, edge apps, and TypeScript SaaS projects.",
+  "type": "module",
+  "packageManager": "pnpm@11.7.0",
+  "scripts": {
+    "apps:build": "pnpm -r --filter './apps/**' run build",
+    "apps:e2e": "pnpm --filter @passkeeper/app-site run test:e2e",
+    "apps:typecheck": "pnpm -r --filter './apps/**' run typecheck",
+    "build": "pnpm -r --filter './packages/**' run build",
+    "changeset": "changeset",
+    "check": "pnpm run typecheck && pnpm run test && pnpm run build && pnpm run pack:check && pnpm run apps:typecheck && pnpm run apps:build && pnpm run examples:typecheck && pnpm run examples:build",
+    "clean": "pnpm -r --filter './packages/**' run clean",
+    "examples:build": "pnpm -r --filter './examples/**' run build",
+    "examples:typecheck": "pnpm -r --filter './examples/**' run typecheck",
+    "pack:check": "PASSKEEPER_ALLOW_ZERO_VERSION=1 node scripts/verify-packages.mjs",
+    "pack:check:consumer": "PASSKEEPER_ALLOW_ZERO_VERSION=1 PASSKEEPER_VERIFY_CONSUMER=1 node scripts/verify-packages.mjs",
+    "pack:check:release": "PASSKEEPER_VERIFY_CONSUMER=1 node scripts/verify-packages.mjs",
+    "release": "pnpm run check && pnpm run pack:check:release && changeset publish",
+    "test": "pnpm -r --filter './packages/**' run test",
+    "typecheck": "pnpm -r --filter './packages/**' run typecheck",
+    "version": "changeset version"
+  },
+  "keywords": [
+    "passkeys",
+    "webauthn",
+    "cloudflare",
+    "auth"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@changesets/cli": "^2.27.11",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}

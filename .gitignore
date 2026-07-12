@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+.pnpm-store/
+dist/
+coverage/
+.astro/
+.turbo/
+.wrangler/
+*.tsbuildinfo

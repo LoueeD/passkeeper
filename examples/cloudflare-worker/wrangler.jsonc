@@ -1,0 +1,23 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "passkeeper-cloudflare-worker-example",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-05",
+  "triggers": {
+    "crons": ["0 3 * * *"]
+  },
+  "vars": {
+    // Set these to the deployed domain in production.
+    // Local dev falls back to the request URL when they are omitted.
+    // "RP_ID": "example.com",
+    // "RP_ORIGIN": "https://example.com"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "passkeeper-example",
+      "database_id": "local-passkeeper-example",
+      "migrations_dir": "../../packages/d1/migrations"
+    }
+  ]
+}

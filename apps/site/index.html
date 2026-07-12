@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Passkey-only authentication for Cloudflare Workers and D1. No passwords, magic links, or hosted auth lock-in."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Passkeeper | Passkey auth for Cloudflare</title>
+  </head>
+  <body>
+    <div class="page" id="top">
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="wordmark" href="#top">passkeeper<span aria-hidden="true">_</span></a>
+        <div class="nav-tools">
+          <a href="#packages">packages</a>
+          <a href="#security">security</a>
+          <a href="#demo">demo</a>
+          <a href="#quickstart">setup</a>
+          <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme">
+            <span aria-hidden="true">theme/</span><span data-theme-label>dark</span>
+          </button>
+        </div>
+      </nav>
+
+      <header class="hero">
+        <div class="hero-mark" aria-hidden="true">
+          <span>PK</span>
+          <span class="hero-mark-dither"></span>
+        </div>
+        <p class="eyebrow">passkey auth / cloudflare workers + d1</p>
+        <h1>Auth primitives.<br />No hosted dependency.</h1>
+        <p class="hero-copy">
+          Passkey-only signup, login, sessions, and invite codes for TypeScript applications.
+          Your users, credentials, and authentication data stay in your own database.
+        </p>
+        <div class="hero-actions">
+          <a class="primary-link" href="#install">install packages <span aria-hidden="true">↓</span></a>
+          <a href="#quickstart">read the setup</a>
+        </div>
+        <dl class="status-line" aria-label="Project status">
+          <div><dt>model</dt><dd>library-first</dd></div>
+          <div><dt>hosting</dt><dd>self-hosted</dd></div>
+          <div><dt>release</dt><dd>pre-1.0</dd></div>
+        </dl>
+      </header>
+
+      <main>
+        <section class="section install" id="install" aria-labelledby="install-title">
+          <div class="section-heading">
+            <h2 id="install-title">install</h2>
+            <span class="dither-rule" aria-hidden="true"></span>
+            <div class="tabs" role="tablist" aria-label="Package manager">
+              <button type="button" role="tab" aria-selected="true" data-package-manager="pnpm">pnpm</button>
+              <button type="button" role="tab" aria-selected="false" data-package-manager="npm">npm</button>
+              <button type="button" role="tab" aria-selected="false" data-package-manager="bun">bun</button>
+            </div>
+          </div>
+          <p class="section-intro">Four focused packages cover the complete Worker and D1 path.</p>
+          <div class="command-row" role="group" aria-label="Install command">
+            <code id="install-command"><span aria-hidden="true">$ </span><span data-command-value>pnpm add @passkeeper/core @passkeeper/client @passkeeper/cloudflare @passkeeper/d1</span></code>
+            <button id="copy-install" type="button">copy</button>
+          </div>
+          <p class="copy-status" data-copy-status aria-live="polite"></p>
+        </section>
+
+        <section class="section" id="packages" aria-labelledby="packages-title">
+          <div class="section-heading">
+            <h2 id="packages-title">packages</h2>
+            <span class="dither-rule" aria-hidden="true"></span>
+          </div>
+          <p class="section-intro">
+            Protocol rules stay separate from browser, runtime, and storage concerns.
+          </p>
+          <ol class="package-list">
+            <li>
+              <span class="item-index">01</span>
+              <div>
+                <h3>@passkeeper/core</h3>
+                <p>Challenges, verification, registration, authentication, sessions, and invites.</p>
+              </div>
+              <span class="item-tag">runtime agnostic</span>
+            </li>
+            <li>
+              <span class="item-index">02</span>
+              <div>
+                <h3>@passkeeper/client</h3>
+                <p>Browser ceremonies, option conversion, credential serialization, and errors.</p>
+              </div>
+              <span class="item-tag">browser</span>
+            </li>
+            <li>
+              <span class="item-index">03</span>
+              <div>
+                <h3>@passkeeper/cloudflare</h3>
+                <p>Worker routes, trusted origins, bounded bodies, cookies, and request hooks.</p>
+              </div>
+              <span class="item-tag">worker</span>
+            </li>
+            <li>
+              <span class="item-index">04</span>
+              <div>
+                <h3>@passkeeper/d1</h3>
+                <p>Inspectable SQL, atomic storage operations, migrations, and scheduled cleanup.</p>
+              </div>
+              <span class="item-tag">storage</span>
+            </li>
+          </ol>
+        </section>
+
+        <section class="section" id="security" aria-labelledby="security-title">
+          <div class="section-heading">
+            <h2 id="security-title">secure defaults</h2>
+            <span class="dither-rule" aria-hidden="true"></span>
+          </div>
+          <p class="section-intro">
+            Security properties are wired into the ordinary path, not left as integration chores.
+          </p>
+          <ul class="security-list">
+            <li><span class="check" aria-hidden="true">✓</span><span>Trusted relying-party and browser-origin validation</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>One-time, expiring challenges consumed atomically</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>Hashed session tokens and invite codes</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>Guarded credential counters and invite usage</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>HttpOnly, Secure, SameSite session cookies</span></li>
+            <li><span class="check" aria-hidden="true">✓</span><span>Oslo parsing with runtime WebCrypto verification</span></li>
+          </ul>
+        </section>
+
+        <section class="section" id="demo" aria-labelledby="demo-title">
+          <div class="section-heading">
+            <h2 id="demo-title">live demo</h2>
+            <span class="dither-rule" aria-hidden="true"></span>
+            <span class="section-meta">worker + d1</span>
+          </div>
+          <p class="section-intro">
+            Run a real passkey ceremony against the same packages shown above. Local development
+            uses the seeded invite <code>launch-code</code>; deployed demos require an issued invite.
+          </p>
+          <passkeeper-auth-demo auth-base="/demo/auth"></passkeeper-auth-demo>
+          <p class="demo-caveat">
+            Demo credentials belong only to this origin. Do not use a production identity here.
+          </p>
+        </section>
+
+        <section class="section" id="quickstart" aria-labelledby="quickstart-title">
+          <div class="section-heading">
+            <h2 id="quickstart-title">worker setup</h2>
+            <span class="dither-rule" aria-hidden="true"></span>
+            <span class="section-meta">src/index.ts</span>
+          </div>
+          <p class="section-intro">
+            Configure the trusted domain, bind D1, and mount auth where the application already runs.
+          </p>
+          <div class="code-window" aria-label="Cloudflare Worker setup example">
+            <div class="code-toolbar">
+              <span>typescript</span>
+              <span>worker / module</span>
+            </div>
+            <pre><code><span class="syntax-keyword">import</span> { createPasskeeperRoutes } <span class="syntax-keyword">from</span> <span class="syntax-string">"@passkeeper/cloudflare"</span>;
+<span class="syntax-keyword">import</span> { d1Adapter } <span class="syntax-keyword">from</span> <span class="syntax-string">"@passkeeper/d1"</span>;
+
+<span class="syntax-keyword">export default</span> {
+  <span class="syntax-keyword">async</span> fetch(request: Request, env: Env) {
+    <span class="syntax-keyword">const</span> auth = createPasskeeperRoutes({
+      rpName: <span class="syntax-string">"My App"</span>,
+      rpId: env.RP_ID,
+      origin: env.RP_ORIGIN,
+      storage: d1Adapter(env.DB),
+      inviteRequired: <span class="syntax-value">true</span>,
+    });
+
+    <span class="syntax-keyword">return</span> auth.handle(request);
+  },
+};</code></pre>
+          </div>
+        </section>
+
+        <section class="closing" aria-labelledby="closing-title">
+          <p class="eyebrow">keep ownership</p>
+          <h2 id="closing-title">Passkeys without handing auth to another platform.</h2>
+          <a class="primary-link" href="#install">start with the packages <span aria-hidden="true">↑</span></a>
+        </section>
+      </main>
+
+      <footer>
+        <span>passkeeper</span>
+        <span>MIT</span>
+        <a href="#top">back to top ↑</a>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

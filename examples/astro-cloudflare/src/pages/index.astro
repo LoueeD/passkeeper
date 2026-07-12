@@ -1,0 +1,344 @@
+---
+const title = "Passkeeper Astro Cloudflare Example";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <main>
+      <section class="intro">
+        <p class="eyebrow">Passkeeper + Astro</p>
+        <h1>Passkey auth from an Astro app running on Cloudflare.</h1>
+        <p>
+          This example keeps the UI in Astro and serves the Passkeeper auth
+          endpoints from an Astro catch-all route backed by D1.
+        </p>
+      </section>
+
+      <form id="register-form" class="panel">
+        <h2>Register</h2>
+        <label>
+          Email
+          <input name="username" type="email" value="jane@example.com" autocomplete="username webauthn" required />
+        </label>
+        <label>
+          Display name
+          <input name="displayName" value="Jane" autocomplete="name" required />
+        </label>
+        <label>
+          Invite code
+          <input name="inviteCode" value="launch-code" autocomplete="one-time-code" required />
+        </label>
+        <button type="submit">Register passkey</button>
+      </form>
+
+      <form id="login-form" class="panel">
+        <h2>Login</h2>
+        <label>
+          Email
+          <input name="username" type="email" value="jane@example.com" autocomplete="username webauthn" required />
+        </label>
+        <button type="submit">Login</button>
+      </form>
+
+      <section id="dashboard" class="panel dashboard" hidden>
+        <div class="dashboard-heading">
+          <div>
+            <p class="eyebrow">Protected dashboard</p>
+            <h2 id="account-name">Account</h2>
+          </div>
+          <span class="status">Authenticated</span>
+        </div>
+        <dl>
+          <div>
+            <dt>Username</dt>
+            <dd id="account-username"></dd>
+          </div>
+          <div>
+            <dt>Session expires</dt>
+            <dd id="session-expiry"></dd>
+          </div>
+        </dl>
+        <div class="actions">
+          <button id="add-passkey-button" type="button">Add passkey</button>
+          <button id="me-button" class="secondary" type="button">Refresh session</button>
+          <button id="logout-button" class="secondary" type="button">Logout</button>
+        </div>
+      </section>
+
+      <section class="panel output">
+        <h2>Output</h2>
+        <pre id="output">Ready.</pre>
+      </section>
+    </main>
+
+    <script>
+      import { addPasskey, loginWithPasskey, registerPasskey } from "@passkeeper/client";
+
+      const output = document.querySelector("#output");
+      const registerForm = document.querySelector("#register-form");
+      const loginForm = document.querySelector("#login-form");
+      const dashboard = document.querySelector("#dashboard");
+      const accountName = document.querySelector("#account-name");
+      const accountUsername = document.querySelector("#account-username");
+      const sessionExpiry = document.querySelector("#session-expiry");
+      const addPasskeyButton = document.querySelector("#add-passkey-button");
+      const meButton = document.querySelector("#me-button");
+      const logoutButton = document.querySelector("#logout-button");
+
+      function show(value) {
+        output.textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+      }
+
+      function formValue(form, name) {
+        const value = new FormData(form).get(name);
+        return typeof value === "string" ? value.trim() : "";
+      }
+
+      function updateDashboard(result) {
+        const authenticated = result?.user != null && result?.session != null;
+        dashboard.hidden = !authenticated;
+
+        if (!authenticated) return;
+
+        accountName.textContent = result.user.displayName || result.user.username;
+        accountUsername.textContent = result.user.username;
+        sessionExpiry.textContent = new Date(result.session.expiresAt).toLocaleString();
+      }
+
+      async function refreshSession({ showResult = true } = {}) {
+        const response = await fetch("/auth/me", { credentials: "include" });
+        const result = await response.json();
+        updateDashboard(response.ok ? result : null);
+        if (showResult) show(result);
+        return result;
+      }
+
+      registerForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try {
+          const inviteCode = formValue(registerForm, "inviteCode");
+          const result = await registerPasskey({
+            beginUrl: "/auth/passkey/register/begin",
+            completeUrl: "/auth/passkey/register/complete",
+            username: formValue(registerForm, "username"),
+            displayName: formValue(registerForm, "displayName"),
+            ...(inviteCode === "" ? {} : { inviteCode }),
+          });
+          show(result);
+          updateDashboard(result);
+        } catch (error) {
+          show(error instanceof Error ? error.message : String(error));
+        }
+      });
+
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        try {
+          const result = await loginWithPasskey({
+            beginUrl: "/auth/passkey/login/begin",
+            completeUrl: "/auth/passkey/login/complete",
+            username: formValue(loginForm, "username"),
+          });
+          show(result);
+          updateDashboard(result);
+        } catch (error) {
+          show(error instanceof Error ? error.message : String(error));
+        }
+      });
+
+      addPasskeyButton.addEventListener("click", async () => {
+        try {
+          const result = await addPasskey({
+            beginUrl: "/auth/passkey/register/add/begin",
+            completeUrl: "/auth/passkey/register/add/complete",
+          });
+          show(result);
+          updateDashboard(result);
+        } catch (error) {
+          show(error instanceof Error ? error.message : String(error));
+        }
+      });
+
+      meButton.addEventListener("click", () => refreshSession());
+
+      logoutButton.addEventListener("click", async () => {
+        const response = await fetch("/auth/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+        const result = await response.json();
+        updateDashboard(null);
+        show(result);
+      });
+
+      refreshSession({ showResult: false }).catch(() => updateDashboard(null));
+    </script>
+  </body>
+</html>
+
+<style>
+  :root {
+    color: #17201b;
+    background: #f6f7f2;
+    font-family:
+      Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  main {
+    width: min(920px, calc(100vw - 32px));
+    margin: 0 auto;
+    padding: 48px 0;
+    display: grid;
+    gap: 18px;
+  }
+
+  .intro {
+    max-width: 720px;
+  }
+
+  .eyebrow {
+    margin: 0 0 8px;
+    color: #516258;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  h1,
+  h2,
+  p {
+    margin-top: 0;
+  }
+
+  h1 {
+    margin-bottom: 12px;
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1;
+  }
+
+  h2 {
+    margin-bottom: 6px;
+    font-size: 18px;
+  }
+
+  .panel {
+    border: 1px solid #d8ddd3;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 20px;
+    display: grid;
+    gap: 14px;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  .dashboard {
+    border-color: #8aa99a;
+  }
+
+  .dashboard-heading {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .dashboard-heading .eyebrow {
+    margin-bottom: 4px;
+  }
+
+  .status {
+    border: 1px solid #8aa99a;
+    border-radius: 999px;
+    color: #1f6f55;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 9px;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 0;
+  }
+
+  dl > div {
+    border-top: 1px solid #d8ddd3;
+    padding-top: 10px;
+  }
+
+  dt {
+    color: #516258;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 4px 0 0;
+    overflow-wrap: anywhere;
+  }
+
+  label {
+    display: grid;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  input,
+  button {
+    min-height: 42px;
+    border-radius: 6px;
+    font: inherit;
+  }
+
+  input {
+    border: 1px solid #b9c3bb;
+    padding: 0 12px;
+  }
+
+  button {
+    border: 0;
+    background: #1f6f55;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 700;
+    padding: 0 14px;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .actions button:not(:first-child) {
+    background: #40535a;
+  }
+
+  button.secondary {
+    background: #40535a;
+  }
+
+  pre {
+    min-height: 96px;
+    margin: 0;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+</style>

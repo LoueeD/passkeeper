@@ -1,0 +1,52 @@
+{
+  "name": "@passkeeper/d1",
+  "version": "0.0.0",
+  "description": "Cloudflare D1 storage adapter and migrations for Passkeeper.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "migrations",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@passkeeper/core": "workspace:*"
+  },
+  "keywords": [
+    "passkeys",
+    "webauthn",
+    "cloudflare",
+    "d1"
+  ],
+  "homepage": "https://github.com/LoueeD/passkeeper#readme",
+  "bugs": {
+    "url": "https://github.com/LoueeD/passkeeper/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LoueeD/passkeeper.git",
+    "directory": "packages/d1"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "miniflare": "4.20260701.0"
+  }
+}

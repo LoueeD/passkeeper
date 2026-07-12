@@ -1,0 +1,19 @@
+{
+  "name": "@passkeeper/example-vue-cloudflare",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vue-tsc -p tsconfig.json --noEmit && vite build",
+    "dev": "vite --host 0.0.0.0",
+    "preview": "vite preview --host 0.0.0.0",
+    "typecheck": "vue-tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@passkeeper/client": "workspace:*",
+    "@vitejs/plugin-vue": "^6.0.2",
+    "vite": "^7.3.0",
+    "vue": "^3.5.26",
+    "vue-tsc": "^3.1.8"
+  }
+}

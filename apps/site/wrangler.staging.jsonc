@@ -1,0 +1,28 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "passkeeper-site-staging",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-07-08",
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "assets": {
+    "run_worker_first": ["/demo/auth/*"]
+  },
+  "triggers": {
+    "crons": ["0 3 * * *"]
+  },
+  "vars": {
+    "RP_ID": "REPLACE_WITH_STAGING_HOSTNAME",
+    "RP_ORIGIN": "https://REPLACE_WITH_STAGING_HOSTNAME"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "passkeeper-site-demo-staging",
+      "database_id": "REPLACE_WITH_STAGING_D1_UUID",
+      "migrations_dir": "../../packages/d1/migrations"
+    }
+  ]
+}

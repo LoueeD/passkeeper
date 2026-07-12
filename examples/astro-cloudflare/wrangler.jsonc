@@ -1,0 +1,20 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "passkeeper-astro-cloudflare-example",
+  "compatibility_date": "2026-07-05",
+  "pages_build_output_dir": "./dist",
+  "vars": {
+    // Set these to the deployed domain in production.
+    // Local dev falls back to the request URL when they are omitted.
+    // "RP_ID": "example.com",
+    // "RP_ORIGIN": "https://example.com"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "passkeeper-astro-example",
+      "database_id": "local-passkeeper-astro-example",
+      "migrations_dir": "../../packages/d1/migrations"
+    }
+  ]
+}

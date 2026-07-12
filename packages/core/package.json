@@ -1,0 +1,48 @@
+{
+  "name": "@passkeeper/core",
+  "version": "0.0.0",
+  "description": "Runtime-agnostic passkey authentication primitives for TypeScript apps.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "keywords": [
+    "passkeys",
+    "webauthn",
+    "auth"
+  ],
+  "homepage": "https://github.com/LoueeD/passkeeper#readme",
+  "bugs": {
+    "url": "https://github.com/LoueeD/passkeeper/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LoueeD/passkeeper.git",
+    "directory": "packages/core"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@oslojs/encoding": "^1.1.0",
+    "@oslojs/webauthn": "^1.0.0"
+  }
+}

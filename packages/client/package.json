@@ -1,0 +1,47 @@
+{
+  "name": "@passkeeper/client",
+  "version": "0.0.0",
+  "description": "Browser helpers for passkey registration, additional credentials, and login.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts",
+    "clean": "rm -rf dist",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "keywords": [
+    "passkeys",
+    "webauthn",
+    "browser"
+  ],
+  "homepage": "https://github.com/LoueeD/passkeeper#readme",
+  "bugs": {
+    "url": "https://github.com/LoueeD/passkeeper/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LoueeD/passkeeper.git",
+    "directory": "packages/client"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@oslojs/encoding": "^1.1.0"
+  }
+}

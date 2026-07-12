@@ -1,0 +1,22 @@
+{
+  "name": "@passkeeper/example-astro-cloudflare",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "astro check && astro build",
+    "dev": "astro dev --host 0.0.0.0",
+    "preview": "wrangler pages dev ./dist",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@passkeeper/client": "workspace:*",
+    "@passkeeper/cloudflare": "workspace:*",
+    "@passkeeper/d1": "workspace:*",
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/cloudflare": "^12.6.9",
+    "astro": "^5.17.5",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.107.0"
+  }
+}
