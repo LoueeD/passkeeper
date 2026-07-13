@@ -1,6 +1,6 @@
 {
   "name": "@passkeeper/d1",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cloudflare D1 storage adapter and migrations for Passkeeper.",
   "type": "module",
   "sideEffects": false,

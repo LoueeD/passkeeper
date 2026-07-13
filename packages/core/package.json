@@ -1,6 +1,6 @@
 {
   "name": "@passkeeper/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Runtime-agnostic passkey authentication primitives for TypeScript apps.",
   "type": "module",
   "sideEffects": false,

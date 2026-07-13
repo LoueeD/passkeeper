@@ -1,0 +1,41 @@
+name: Release packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type publish to release the versioned packages on main
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main' && inputs.confirm == 'publish'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: npm-publish
+      cancel-in-progress: false
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Publish versioned packages
+        run: pnpm run release

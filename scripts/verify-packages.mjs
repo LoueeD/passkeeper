@@ -1,9 +1,11 @@
-import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const root = resolve(import.meta.dirname, "..");
+const packageManager = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).packageManager;
+assert(typeof packageManager === "string" && packageManager.startsWith("pnpm@"), "packageManager must pin pnpm.");
 const temporaryDirectory = mkdtempSync(join(tmpdir(), "passkeeper-package-check-"));
 const packageDefinitions = [
   { directory: "packages/core", name: "@passkeeper/core" },
@@ -81,6 +83,7 @@ try {
         {
           private: true,
           type: "module",
+          packageManager,
           dependencies: Object.fromEntries(
             [...archives].map(([name, archive]) => [name, `file:${archive}`]),
           ),
@@ -95,7 +98,7 @@ try {
         .map(([name, archive]) => `  ${JSON.stringify(name)}: ${JSON.stringify(`file:${archive}`)}`)
         .join("\n")}\n`,
     );
-    run("pnpm", ["install", "--prefer-offline", "--ignore-scripts", "--no-frozen-lockfile"], {
+    run("corepack", ["pnpm", "install", "--prefer-offline", "--ignore-scripts", "--no-frozen-lockfile"], {
       cwd: consumerDirectory,
     });
     run(

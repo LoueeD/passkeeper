@@ -9,7 +9,7 @@ Before versioning packages:
 - Confirm the publishing npm account owns or can publish under the `@passkeeper` scope.
 - Confirm the intended source repository URL, issue tracker URL, and project homepage.
 - Add those URLs to every publishable package manifest once they are authoritative.
-- Confirm npm two-factor authentication and provenance requirements for the publishing account.
+- Configure npm trusted publishing for the GitHub Actions workflow in `.github/workflows/release.yml`. It uses GitHub OIDC rather than a long-lived npm token or local one-time password.
 - Confirm the four package names are still unclaimed in the public registry.
 
 Do not invent or copy placeholder ownership metadata into published manifests. A registry `404` means a public package is not currently visible; it does not prove that the active npm account controls the scope.
@@ -65,10 +65,14 @@ Also deploy the Worker example to a non-production Cloudflare environment and re
 
 ## Publish
 
-Once package ownership, metadata, versioning, automated checks, and manual validation are complete:
+Once package ownership, trusted publishing, metadata, versioning, automated checks, and manual validation are complete, commit and push the versioned manifests and changelogs. Confirm CI is green on `main`, then start **Release packages** from the GitHub Actions tab with the `main` branch selected and type `publish` into its confirmation field.
+
+The workflow runs:
 
 ```bash
 pnpm run release
 ```
 
-The release command reruns the workspace and release artifact checks before invoking `changeset publish`.
+It reruns the workspace and release artifact checks before invoking `changeset publish`. The workflow is manual-only and requires the exact confirmation text to guard against accidental publication.
+
+Do not use a long-lived npm token for routine releases. If npm requires a bootstrap credential before it permits trusted-publisher setup for a new package, use a narrowly scoped, short-lived publish credential once, revoke it immediately after the bootstrap release, and switch all subsequent releases to this workflow.

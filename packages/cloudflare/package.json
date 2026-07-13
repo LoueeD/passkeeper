@@ -1,6 +1,6 @@
 {
   "name": "@passkeeper/cloudflare",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cloudflare Workers route helpers for Passkeeper.",
   "type": "module",
   "sideEffects": false,
