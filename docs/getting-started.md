@@ -1,6 +1,6 @@
 # Getting Started
 
-Passkeeper is currently a pnpm workspace with local packages and runnable examples. The packages are not documented here as published npm packages yet; use workspace dependencies while developing.
+Passkeeper is a pnpm workspace with published packages and runnable local examples. Workspace packages are linked automatically during repository development; consumers install the public `@passkeeper/*` packages from npm.
 
 ## Install
 

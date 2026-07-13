@@ -1,78 +1,103 @@
 # Releasing
 
-Passkeeper uses Changesets to version and publish its four public packages together for the initial release.
+Passkeeper uses Changesets for package versions and changelogs. Publishing runs only from the manual **Release packages** GitHub Actions workflow using npm trusted publishing and GitHub OIDC.
 
-## Publisher Preflight
+The four public packages can be versioned independently:
 
-Before versioning packages:
+```txt
+@passkeeper/core
+@passkeeper/client
+@passkeeper/cloudflare
+@passkeeper/d1
+```
 
-- Confirm the publishing npm account owns or can publish under the `@passkeeper` scope.
-- Confirm the intended source repository URL, issue tracker URL, and project homepage.
-- Add those URLs to every publishable package manifest once they are authoritative.
-- Configure npm trusted publishing for the GitHub Actions workflow in `.github/workflows/release.yml`. It uses GitHub OIDC rather than a long-lived npm token or local one-time password.
-- Confirm the four package names are still unclaimed in the public registry.
+## 1. Add A Changeset
 
-Do not invent or copy placeholder ownership metadata into published manifests. A registry `404` means a public package is not currently visible; it does not prove that the active npm account controls the scope.
+Every pull request with a user-visible package change should include a changeset:
 
-## Version Packages
+```bash
+pnpm run changeset
+```
 
-Review the pending changesets, then apply them:
+Select every affected package, choose the appropriate semantic-version bump, and write a concise user-facing summary. Documentation, tests, examples, and internal tooling changes do not need a changeset unless they alter a published package's behavior or contents.
+
+Commit the generated `.changeset/*.md` file with the change. Do not edit package versions directly during normal development.
+
+## 2. Prepare The Release
+
+Start from an up-to-date `main` branch with dependencies installed using the repository's pinned pnpm version. Apply all pending changesets:
 
 ```bash
 pnpm run version
 ```
 
-For the initial changeset, this should move all four packages from `0.0.0` to `0.1.0` and replace internal `workspace:*` dependency ranges with publishable versions.
+Review the generated changes carefully:
 
-Review the resulting package versions, internal dependency ranges, changelogs, and lockfile before continuing.
+- Package versions match the intended semantic-version bumps.
+- Internal `@passkeeper/*` dependency ranges were updated where required.
+- Package changelogs are accurate and readable.
+- Consumed changeset files were removed.
+- `pnpm-lock.yaml` contains only the expected version updates.
 
-## Verify Release Artifacts
-
-Run the full workspace gate:
+Run the complete release validation locally:
 
 ```bash
 pnpm run check
-```
-
-Then run the release package check:
-
-```bash
+pnpm run apps:e2e
 pnpm run pack:check:release
 ```
 
-The release check rejects placeholder `0.0.0` versions, inspects required archive files and manifest fields, installs all packed packages into a clean temporary consumer, and imports every package entrypoint.
+`pack:check:release` rejects placeholder versions, inspects package archives and publish metadata, installs the archives into a clean consumer project, and imports every public entrypoint.
 
-## Manual Validation
+For security-sensitive changes, also exercise registration, login, session lookup, additional-passkey registration, logout, invite rejection, and origin rejection with a physical passkey-capable browser. Validate Cloudflare-specific changes in a non-production Worker environment over HTTPS.
 
-Before the first release, validate the site's embedded demo against a local D1 database in a real passkey-capable browser:
+## 3. Merge The Version Changes
 
-Run the automated Chrome ceremony first:
+Commit the versioned manifests, changelogs, lockfile, and removed changesets together. A conventional commit such as this is suitable:
 
 ```bash
-pnpm run apps:e2e
+git commit -m "chore: release packages"
 ```
 
-It uses virtual WebAuthn authenticators and isolated local D1 state to cover registration, session lookup, adding another passkey, logout, and login. Then repeat the critical flow manually with physical passkey-capable devices:
+Push the commit and wait for CI to pass on `main`. Never publish from an unmerged branch or while required CI checks are failing.
 
-- Register with the development invite.
-- Log out and log back in.
-- Read the current session from `/auth/me`.
-- Add a second passkey while authenticated.
-- Confirm an invalid or reused invite is rejected.
-- Confirm an untrusted browser origin is rejected.
+## 4. Publish From GitHub Actions
 
-Also deploy the Worker example to a non-production Cloudflare environment and repeat registration, login, session, and logout checks over HTTPS.
+In the repository's **Actions** tab:
 
-## Publish
+1. Open **Release packages**.
+2. Choose **Run workflow** with the `main` branch selected.
+3. Enter `publish` in the confirmation field.
+4. Start the workflow and monitor it through completion.
 
-Once package ownership, trusted publishing, metadata, versioning, automated checks, and manual validation are complete, commit and push the versioned manifests and changelogs. Confirm CI is green on `main`, then start **Release packages** from the GitHub Actions tab with the `main` branch selected and type `publish` into its confirmation field.
-
-The workflow runs:
+The workflow installs the pinned project dependencies, upgrades npm to a trusted-publishing-compatible version, and runs:
 
 ```bash
 pnpm run release
 ```
 
-It reruns the workspace and release artifact checks before invoking `changeset publish`. The workflow is manual-only and requires the exact confirmation text to guard against accidental publication.
+That command repeats the full workspace and package-archive checks before `changeset publish` publishes only package versions not already present on npm. npm authenticates the publish through the workflow's short-lived OIDC identity; the repository must not contain an npm publish token or an `NPM_TOKEN` release secret.
 
-Do not use a long-lived npm token for routine releases. If npm requires a bootstrap credential before it permits trusted-publisher setup for a new package, use a narrowly scoped, short-lived publish credential once, revoke it immediately after the bootstrap release, and switch all subsequent releases to this workflow.
+Successful trusted publishes from this public GitHub repository receive npm provenance attestations automatically. The workflow then pushes the package tags generated by Changesets, such as `@passkeeper/core@0.2.0`, to GitHub.
+
+## 5. Verify The Release
+
+After the workflow succeeds:
+
+- Confirm each intended package version and `latest` dist-tag on npm.
+- Confirm internal `@passkeeper/*` dependencies resolve to published versions.
+- Confirm npm displays provenance for the newly published versions.
+- Confirm the corresponding package tags exist in GitHub.
+- Install the packages in a clean consumer project when the release changes packaging, exports, or dependency relationships.
+
+GitHub Releases are optional. Package changelogs, npm versions, provenance, and immutable Git tags are the canonical release record; create a GitHub Release only when longer-form announcements or downloadable assets are useful.
+
+## Failure And Recovery
+
+Package versions on npm are immutable. Never attempt to reuse a version after any package was successfully published.
+
+If validation fails before publishing, fix the problem in a new commit and rerun the workflow. If publishing fails partway through, inspect npm to identify which package versions succeeded. Add corrective changesets or version the unpublished packages as necessary, commit the result, let CI pass, and rerun the workflow. `changeset publish` skips versions already present on npm.
+
+For OIDC authentication failures, check that every package's npm trusted publisher names repository `LoueeD/passkeeper`, workflow file `release.yml`, and the `npm publish` action. Also confirm the workflow has `id-token: write`, uses a GitHub-hosted runner, and the package `repository.url` exactly matches this repository.
+
+The initial `0.1.0` bootstrap used a temporary granular token because npm required each package to exist before trusted publishing could be configured. That token has been revoked. Do not recreate a publish token for routine releases.
