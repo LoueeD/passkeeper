@@ -84,15 +84,16 @@ try {
           dependencies: Object.fromEntries(
             [...archives].map(([name, archive]) => [name, `file:${archive}`]),
           ),
-          pnpm: {
-            overrides: Object.fromEntries(
-              [...archives].map(([name, archive]) => [name, `file:${archive}`]),
-            ),
-          },
         },
         null,
         2,
       )}\n`,
+    );
+    writeFileSync(
+      join(consumerDirectory, "pnpm-workspace.yaml"),
+      `overrides:\n${[...archives]
+        .map(([name, archive]) => `  ${JSON.stringify(name)}: ${JSON.stringify(`file:${archive}`)}`)
+        .join("\n")}\n`,
     );
     run("pnpm", ["install", "--prefer-offline", "--ignore-scripts", "--no-frozen-lockfile"], {
       cwd: consumerDirectory,
