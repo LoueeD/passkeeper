@@ -430,7 +430,6 @@ h1 {
 }
 
 .security-list li {
-  min-height: 64px;
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr);
   gap: 10px;
@@ -649,6 +648,36 @@ passkeeper-auth-demo {
   color: var(--faint);
   font-family: var(--font-ui);
   font-size: 11px;
+}
+
+.code-toolbar button {
+  min-width: 54px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.code-toolbar button:hover {
+  color: var(--accent-strong);
+}
+
+.prompt-window pre {
+  max-height: 290px;
+  white-space: pre-wrap;
+}
+
+.prompt-window code {
+  display: block;
+}
+
+.demo-panel input[readonly] {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
 }
 
 pre {

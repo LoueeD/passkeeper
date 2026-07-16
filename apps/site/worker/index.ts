@@ -29,6 +29,20 @@ export default {
   },
 
   async scheduled(_controller: ScheduledController, env: Env): Promise<void> {
-    await d1Adapter(env.DB).deleteExpiredRecords(new Date());
+    const now = new Date();
+    await d1Adapter(env.DB).deleteExpiredRecords(now);
+    await deleteOldDemoUsers(env.DB, new Date(now.getTime() - 24 * 60 * 60 * 1000));
   },
 } satisfies ExportedHandler<Env>;
+
+async function deleteOldDemoUsers(database: D1Database, cutoff: Date): Promise<void> {
+  const timestamp = cutoff.toISOString();
+  const oldUsers = "select id from passkeeper_users where created_at < ?";
+
+  await database.batch([
+    database.prepare(`delete from passkeeper_credentials where user_id in (${oldUsers})`).bind(timestamp),
+    database.prepare(`delete from passkeeper_sessions where user_id in (${oldUsers})`).bind(timestamp),
+    database.prepare(`delete from passkeeper_challenges where user_id in (${oldUsers})`).bind(timestamp),
+    database.prepare("delete from passkeeper_users where created_at < ?").bind(timestamp),
+  ]);
+}

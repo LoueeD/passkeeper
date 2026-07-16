@@ -3,6 +3,13 @@
   "name": "passkeeper",
   "main": "worker/index.ts",
   "compatibility_date": "2026-07-08",
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "passkeeper.lougd.com",
+      "custom_domain": true
+    }
+  ],
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1
@@ -14,14 +21,14 @@
     "crons": ["0 3 * * *"]
   },
   "vars": {
-    "RP_ID": "localhost",
-    "RP_ORIGIN": "http://localhost:4174"
+    "RP_ID": "passkeeper.lougd.com",
+    "RP_ORIGIN": "https://passkeeper.lougd.com"
   },
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "passkeeper-site-demo",
-      "database_id": "local-passkeeper-site-demo",
+      "database_name": "passkeeper",
+      "database_id": "ba00a40b-5774-417f-9c61-25f215cf5e4b",
       "migrations_dir": "../../packages/d1/migrations"
     }
   ]

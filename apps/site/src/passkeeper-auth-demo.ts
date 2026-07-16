@@ -22,7 +22,9 @@ export class PasskeeperAuthDemo extends HTMLElement {
   }
 
   private render(): void {
-    const localInvite = window.location.hostname === "localhost" ? "launch-code" : "";
+    const local = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    const inviteCode = local ? "launch-code" : "passkeeper-demo";
+    const demoUsername = `demo-${crypto.randomUUID().slice(0, 8)}@example.com`;
 
     this.innerHTML = `
       <div class="demo-shell">
@@ -35,15 +37,15 @@ export class PasskeeperAuthDemo extends HTMLElement {
           <form id="register-form">
             <label>
               <span>email</span>
-              <input name="username" type="email" value="jane@example.com" autocomplete="username webauthn" required />
+              <input name="username" type="email" value="${demoUsername}" autocomplete="username webauthn" required />
             </label>
             <label>
               <span>display name</span>
-              <input name="displayName" value="Jane" autocomplete="name" required />
+              <input name="displayName" value="Demo Visitor" autocomplete="name" required />
             </label>
             <label>
-              <span>invite code</span>
-              <input name="inviteCode" value="${localInvite}" autocomplete="one-time-code" required />
+              <span>invite code / shared</span>
+              <input name="inviteCode" value="${inviteCode}" autocomplete="one-time-code" readonly required />
             </label>
             <button class="demo-primary" type="submit" data-demo-action>register passkey</button>
           </form>
@@ -53,7 +55,7 @@ export class PasskeeperAuthDemo extends HTMLElement {
           <form id="login-form">
             <label>
               <span>email</span>
-              <input name="username" type="email" value="jane@example.com" autocomplete="username webauthn" required />
+              <input name="username" type="email" value="${demoUsername}" autocomplete="username webauthn" required />
             </label>
             <button class="demo-primary" type="submit" data-demo-action>login with passkey</button>
           </form>

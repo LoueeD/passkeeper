@@ -20,7 +20,11 @@ const packageTabs = Array.from(
 const commandValue = document.querySelector<HTMLElement>("[data-command-value]");
 const copyButton = document.querySelector<HTMLButtonElement>("#copy-install");
 const copyStatus = document.querySelector<HTMLElement>("[data-copy-status]");
+const agentPrompt = document.querySelector<HTMLElement>("#agent-prompt");
+const agentCopyButton = document.querySelector<HTMLButtonElement>("#copy-agent-prompt");
+const agentCopyStatus = document.querySelector<HTMLElement>("[data-agent-copy-status]");
 let copyResetTimer: number | undefined;
+let agentCopyResetTimer: number | undefined;
 
 setTheme(initialTheme());
 
@@ -68,6 +72,24 @@ copyButton?.addEventListener("click", async () => {
     range.selectNodeContents(commandValue);
     selection?.addRange(range);
     showCopyResult("command selected", "selected");
+  }
+});
+
+agentCopyButton?.addEventListener("click", async () => {
+  if (agentPrompt === null) return;
+  const prompt = agentPrompt.textContent?.trim();
+  if (prompt === undefined || prompt === "") return;
+
+  try {
+    await writeClipboard(prompt);
+    showAgentCopyResult("copied to clipboard", "copied");
+  } catch {
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    const range = document.createRange();
+    range.selectNodeContents(agentPrompt);
+    selection?.addRange(range);
+    showAgentCopyResult("prompt selected", "selected");
   }
 });
 
@@ -164,4 +186,20 @@ function clearCopyResult(): void {
   if (copyButton !== null) {
     copyButton.textContent = "copy";
   }
+}
+
+function showAgentCopyResult(message: string, buttonLabel: string): void {
+  if (agentCopyResetTimer !== undefined) window.clearTimeout(agentCopyResetTimer);
+  if (agentCopyStatus !== null) agentCopyStatus.textContent = message;
+  if (agentCopyButton !== null) agentCopyButton.textContent = buttonLabel;
+  agentCopyResetTimer = window.setTimeout(clearAgentCopyResult, 1800);
+}
+
+function clearAgentCopyResult(): void {
+  if (agentCopyResetTimer !== undefined) {
+    window.clearTimeout(agentCopyResetTimer);
+    agentCopyResetTimer = undefined;
+  }
+  if (agentCopyStatus !== null) agentCopyStatus.textContent = "";
+  if (agentCopyButton !== null) agentCopyButton.textContent = "copy";
 }

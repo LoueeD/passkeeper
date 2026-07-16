@@ -29,7 +29,7 @@ The preferred initial product is a Cloudflare Worker + D1 starter for passkey-on
 - `SECURITY.md`: vulnerability reporting policy and supported-version note.
 - `docs/getting-started.md`: practical quickstart for packages and examples.
 - `docs/cloudflare.md`: Worker/D1 setup details and route behavior.
-- `docs/cloudflare-staging.md`: guarded staging resource, migration, deploy, validation, and rollback workflow.
+- `docs/deploying.md`: production site migration, deploy, validation, and rollback workflow.
 - `docs/d1-migrations.md`: local and remote D1 migration and cleanup workflows.
 - `docs/releasing.md`: package ownership, versioning, verification, and publishing preflight.
 - `docs/concepts.md`: core auth concepts used by the implementation.

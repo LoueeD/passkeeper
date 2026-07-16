@@ -14,6 +14,7 @@ const origin = "http://localhost:4174";
 let browser;
 let worker;
 let workerOutput = () => "";
+const responseErrors = [];
 
 try {
   await assertPortAvailable(4174);
@@ -21,10 +22,12 @@ try {
   runWrangler([
     "d1", "migrations", "apply", "passkeeper-site-demo", "--local",
     "--persist-to", persistenceDirectory,
+    "--config", "wrangler.local.jsonc",
   ]);
   runWrangler([
     "d1", "execute", "passkeeper-site-demo", "--local",
     "--persist-to", persistenceDirectory,
+    "--config", "wrangler.local.jsonc",
     "--file", resolve(rootDirectory, "scripts/seed-development-invite.sql"),
   ]);
 
@@ -46,6 +49,12 @@ try {
   });
   const context = await browser.newContext();
   const page = await context.newPage();
+  page.on("response", (response) => {
+    if (response.status() < 400) return;
+    void response.text().then((body) => {
+      responseErrors.push(`${response.status()} ${response.url()} ${body}`);
+    });
+  });
   const cdp = await context.newCDPSession(page);
   await cdp.send("WebAuthn.enable");
   const credentialEvents = [];
@@ -56,6 +65,8 @@ try {
 
   await page.goto(`${origin}/#demo`);
   await page.locator("passkeeper-auth-demo").waitFor();
+  assert.match(await page.locator("#agent-prompt").innerText(), /First inspect the runtime/u);
+  assert.equal(await page.locator('#register-form input[name="inviteCode"]').inputValue(), "launch-code");
   const username = `browser-${Date.now()}@example.com`;
   await page.locator('#register-form input[name="username"]').fill(username);
   await page.locator('#register-form input[name="displayName"]').fill("Browser Test");
@@ -180,8 +191,8 @@ async function waitForWorker(url, process, output) {
   while (Date.now() < deadline) {
     if (process.exitCode !== null) throw new Error(`Vite exited before startup.\n${output()}`);
     try {
-      const response = await fetch(url);
-      if (response.ok) return;
+      const response = await fetch(`${url}/demo/auth/me`);
+      if (response.status === 401) return;
     } catch {}
     await delay(100);
   }
@@ -200,6 +211,7 @@ async function waitForOutput(page, predicate) {
   }
   throw new Error(
     `Timed out waiting for demo output. Last output: ${await page.locator("#output").textContent()}\n` +
+    `HTTP errors:\n${responseErrors.join("\n")}\n` +
     `Vite output:\n${workerOutput()}`,
   );
 }

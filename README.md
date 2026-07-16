@@ -59,7 +59,7 @@ Please report suspected vulnerabilities privately. See [SECURITY.md](SECURITY.md
 
 - [Getting Started](docs/getting-started.md)
 - [Cloudflare](docs/cloudflare.md)
-- [Cloudflare Staging](docs/cloudflare-staging.md)
+- [Deploying the Site](docs/deploying.md)
 - [D1 Migrations](docs/d1-migrations.md)
 - [Releasing](docs/releasing.md)
 - [Concepts](docs/concepts.md)

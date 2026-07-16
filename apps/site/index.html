@@ -18,6 +18,7 @@
           <a href="#packages">packages</a>
           <a href="#security">security</a>
           <a href="#demo">demo</a>
+          <a href="#agent">agent</a>
           <a href="#quickstart">setup</a>
           <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme">
             <span aria-hidden="true">theme/</span><span data-theme-label>dark</span>
@@ -64,6 +65,25 @@
             <button id="copy-install" type="button">copy</button>
           </div>
           <p class="copy-status" data-copy-status aria-live="polite"></p>
+        </section>
+
+        <section class="section" id="agent" aria-labelledby="agent-title">
+          <div class="section-heading">
+            <h2 id="agent-title">agent setup</h2>
+            <span class="dither-rule" aria-hidden="true"></span>
+            <span class="section-meta">copy / paste</span>
+          </div>
+          <p class="section-intro">
+            Give this prompt to your coding agent. It checks compatibility before changing the project.
+          </p>
+          <div class="code-window prompt-window" aria-label="Passkeeper coding agent prompt">
+            <div class="code-toolbar">
+              <span>prompt</span>
+              <button id="copy-agent-prompt" type="button">copy</button>
+            </div>
+            <pre id="agent-prompt"><code>Integrate Passkeeper passkey auth into this repository. First inspect the runtime, framework, package manager, database, routing, and deployment target; report whether Passkeeper is compatible before changing files. If compatible, follow existing conventions and install only the required @passkeeper packages. For Cloudflare Workers with D1, prefer @passkeeper/cloudflare, @passkeeper/d1, and @passkeeper/client. Configure the exact RP_ID and RP_ORIGIN, apply the shipped D1 migration, mount auth routes, and wire registration, login, session, and logout. Do not invent APIs: inspect the installed package READMEs and exports. Run the relevant tests, typecheck, and build, then summarize changes and remaining deployment or manual passkey steps. Stop and explain if the stack is incompatible or security-critical values are unknown.</code></pre>
+          </div>
+          <p class="copy-status" data-agent-copy-status aria-live="polite"></p>
         </section>
 
         <section class="section" id="packages" aria-labelledby="packages-title">
@@ -135,12 +155,13 @@
             <span class="section-meta">worker + d1</span>
           </div>
           <p class="section-intro">
-            Run a real passkey ceremony against the same packages shown above. Local development
-            uses the seeded invite <code>launch-code</code>; deployed demos require an issued invite.
+            Run a real passkey ceremony against the same packages shown above. The shared demo
+            invite is prefilled, so each visitor can register immediately.
           </p>
           <passkeeper-auth-demo auth-base="/demo/auth"></passkeeper-auth-demo>
           <p class="demo-caveat">
-            Demo credentials belong only to this origin. Do not use a production identity here.
+            Demo credentials belong only to this origin. Accounts are cleared daily once 24 hours
+            old. Do not use a production identity here.
           </p>
         </section>
 

@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "passkeeper-site-staging",
+  "name": "passkeeper-local",
   "main": "worker/index.ts",
   "compatibility_date": "2026-07-08",
   "observability": {
@@ -14,14 +14,14 @@
     "crons": ["0 3 * * *"]
   },
   "vars": {
-    "RP_ID": "REPLACE_WITH_STAGING_HOSTNAME",
-    "RP_ORIGIN": "https://REPLACE_WITH_STAGING_HOSTNAME"
+    "RP_ID": "localhost",
+    "RP_ORIGIN": "http://localhost:4174"
   },
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "passkeeper-site-demo-staging",
-      "database_id": "REPLACE_WITH_STAGING_D1_UUID",
+      "database_name": "passkeeper-site-demo",
+      "database_id": "local-passkeeper-site-demo",
       "migrations_dir": "../../packages/d1/migrations"
     }
   ]

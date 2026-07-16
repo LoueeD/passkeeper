@@ -18,4 +18,4 @@ Run the isolated browser flow with:
 pnpm run apps:e2e
 ```
 
-See [Cloudflare Staging](../../docs/cloudflare-staging.md) for remote D1 and deployment setup.
+See [Deploying The Site](../../docs/deploying.md) for the production D1 and deployment workflow.
